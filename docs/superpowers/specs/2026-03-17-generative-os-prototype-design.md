@@ -16,9 +16,10 @@ Six app icons (Calendar, Maps, Weather, Closet, Spotify, Spending) float on the 
 
 **Merge mechanics:**
 - Icons use Framer Motion `drag` prop (works on touch + mouse)
-- Proximity detection: when two icons are within ~60px, they "snap" with a glow
+- Icons are absolutely positioned with explicit `x`/`y` coordinates in a layout config (enables animated bounce-back)
+- Proximity detection: when two icons are within ~60px, they "snap" with a glow. Proximity checks throttled to ~16ms (requestAnimationFrame) to prevent jank
 - Valid merge: particle burst → card slides up from bottom
-- Invalid merge: shake animation → icons bounce back to original positions
+- Invalid merge: shake animation → icons animate back to their origin coordinates via Framer Motion `animate`
 - Combination lookup is a simple map of valid pairs
 
 ## Architecture
@@ -28,7 +29,7 @@ src/
   components/
     PhoneFrame.tsx        — 375px device chrome (Dynamic Island, home bar)
     AppIcon.tsx           — Draggable app icon with label and color
-    DragMergeArea.tsx     — Main screen: 6 icons + merge logic + time slider
+    DragMergeArea.tsx     — Main screen layout/orchestration: renders icons + time slider, delegates all drag/merge logic to useDragMerge hook
     TimeSlider.tsx        — Time-of-day slider for auto-trigger simulation
     cards/
       RouteOptimizer.tsx  — Maps + Calendar (Combination 1)
@@ -39,11 +40,11 @@ src/
       LunchBreak.tsx      — 12PM auto-trigger card
     ui/
       Card.tsx            — Base card wrapper (rounded corners, shadow, dark mode)
-      MergeAnimation.tsx  — Glow/particle burst effect on merge
+      MergeAnimation.tsx  — Glow/particle burst effect on merge. Rendered by DragMergeArea at the merge point coordinates. Receives `position: {x, y}` and `active: boolean` props. On completion, fires `onComplete` callback which triggers the card slide-up
   data/
     mockData.ts           — All mock data from concept doc Section 11
   hooks/
-    useDragMerge.ts       — Drag detection, proximity check, merge validation
+    useDragMerge.ts       — Owns all position tracking, proximity calculation, merge-pair resolution, and merge validation. DragMergeArea calls this hook and passes results to AppIcon children
   App.tsx
 ```
 
@@ -61,9 +62,9 @@ Each card is a full-screen overlay that slides up via Framer Motion. Dismiss by 
 
 ### 1. Route Optimizer (Maps + Calendar)
 
-- **Top**: SVG map area with markers for each meeting location (WeWork SOMA, Blue Bottle Hayes, Tipstown FiDi). Dashed route line connecting markers in chronological order. Travel time labels between stops.
+- **Top**: SVG map area with markers for each meeting location. Only events with physical locations are plotted — "Online (Zoom)" events are excluded from the map but shown in the timeline. Dashed route line connecting markers in chronological order. Travel time labels between stops.
 - **Summary pill**: "3 stops · ~36 min total"
-- **Bottom**: Scrollable timeline of event cards (chronological). Each card shows time, title, location, travel time to next stop. Gap cards between meetings suggest nearby cafes (e.g., "15 min gap — Blue Bottle 0.2mi away").
+- **Bottom**: Scrollable timeline of event cards (chronological). Each card shows time, title, location, travel time to next stop. Gap cards between meetings show hardcoded suggestions (e.g., "15 min gap — Blue Bottle 0.2mi away") — these are display strings in the component, not data-driven.
 
 ### 2. Outfit Recommendation (Weather + Closet)
 
@@ -76,6 +77,7 @@ Each card is a full-screen overlay that slides up via Framer Motion. Dismiss by 
 ### 3. Contextual Playlist (Spotify + Calendar)
 
 - **Context tag**: "Commuting" / "At Cafe" / "Before Meeting" with icon
+- **Context selection rule**: Default to `commute`. If time slider is active, map time ranges: 7–9AM → `commute`, 10AM–1PM → `cafe`, 2–6PM → `focus`. In drag-merge mode (no time slider), default to `commute` with tappable context switcher to cycle through all three.
 - **Track list**: Songs matched to current context with artist names
 - **Mini player**: Play/pause/skip controls (cosmetic)
 - **Next context preview**: "Investor Meeting in 45 min — switching to Focus mode"
@@ -93,12 +95,12 @@ A slider at the top of the main screen, ranging from 7AM to 9PM. As the user dra
 
 | Time | Card |
 |------|------|
-| 7 AM | Weather + Outfit recommendation |
-| 8 AM | Maps + Calendar route optimizer |
-| 12 PM | Lunch break — nearby places card |
-| 9 PM | Day summary (timeline + spending + steps + tomorrow preview) |
+| 7 AM | Reuses `OutfitRec.tsx` component |
+| 8 AM | Reuses `RouteOptimizer.tsx` component |
+| 12 PM | `LunchBreak.tsx` — nearby places card |
+| 9 PM | `DaySummary.tsx` — timeline + spending + steps + tomorrow preview |
 
-Smooth crossfade transitions between cards as slider moves.
+The 7AM and 8AM auto-triggers render the same card components used in drag-to-merge. Smooth crossfade transitions between cards as slider moves.
 
 ## Design System
 
@@ -119,18 +121,28 @@ Smooth crossfade transitions between cards as slider moves.
 - Font: system font stack
 
 ### Dark Mode
-- Tailwind `darkMode: 'class'`
-- Toggle button in phone frame
+- Tailwind CSS v4: use `@custom-variant dark (&:where(.dark, .dark *));` in the CSS entry point
+- Toggle button in phone frame adds/removes `.dark` class on the phone frame container
 - Built into every component from the start
 
 ## Mock Data
 
-All data from concept doc Section 11:
+All data from concept doc Section 11, plus additional data for auto-trigger cards:
 - **Calendar**: 4 events (Design Review, Lunch with Sarah, Investor Meeting, Team Standup)
 - **Weather**: 52°F, partly cloudy, 40% rain after 2pm, hourly forecast
 - **Closet**: 9 items (coats, tops, bottoms, shoes with warmth ratings)
 - **Spending**: 8 transactions across SF with lat/lng coordinates
 - **Music**: 3 context playlists (commute/cafe/focus, 3 tracks each)
+- **Nearby places** (for LunchBreak card): 3 hardcoded lunch spots near SOMA with name, cuisine, distance, rating
+- **Steps/activity** (for DaySummary card): `{ steps: 8234, miles: 4.2 }`
+- **Tomorrow** (for DaySummary card): 2 events (e.g., "10 AM Team Sync", "2 PM 1:1 with Sarah")
+
+### SVG Map Projection
+
+Both map cards (RouteOptimizer, SpendingHeatmap) use a fixed bounding box for SF and linear scaling:
+- Bounding box: `minLat: 37.74, maxLat: 37.81, minLng: -122.43, maxLng: -122.39`
+- Projection: simple linear interpolation from lat/lng to SVG pixel coordinates within the map viewport
+- No external mapping library needed
 
 ## Tech Stack
 
