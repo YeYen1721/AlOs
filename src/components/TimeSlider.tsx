@@ -1,6 +1,7 @@
 interface TimeSliderProps {
   value: number
   onChange: (hour: number) => void
+  isDark?: boolean
 }
 
 function formatTime(hour: number): string {
@@ -18,8 +19,9 @@ const markers = [
   { hour: 21, label: '9PM' },
 ]
 
-export default function TimeSlider({ value, onChange }: TimeSliderProps) {
+export default function TimeSlider({ value, onChange, isDark }: TimeSliderProps) {
   const progress = ((value - 7) / (21 - 7)) * 100
+  const trackBg = isDark ? '#374151' : '#E5E7EB'
 
   return (
     <div className="px-5 py-3">
@@ -38,14 +40,14 @@ export default function TimeSlider({ value, onChange }: TimeSliderProps) {
           onChange={(e) => onChange(parseFloat(e.target.value))}
           className="w-full h-1.5 appearance-none rounded-full cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #4285F4 0%, #4285F4 ${progress}%, #E5E7EB ${progress}%, #E5E7EB 100%)`,
+            background: `linear-gradient(to right, #4285F4 0%, #4285F4 ${progress}%, ${trackBg} ${progress}%, ${trackBg} 100%)`,
           }}
         />
 
         {/* Time markers */}
         <div className="flex justify-between mt-1">
           {markers.map((m) => (
-            <span key={m.hour} className="text-[9px] text-gray-400 dark:text-gray-600">{m.label}</span>
+            <span key={m.hour} className="text-[9px] text-gray-400 dark:text-gray-500">{m.label}</span>
           ))}
         </div>
       </div>

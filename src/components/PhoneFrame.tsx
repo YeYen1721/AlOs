@@ -1,10 +1,14 @@
+interface PhoneFrameProps {
+  children: (isDark: boolean) => React.ReactNode
+}
+
 import { useState } from 'react'
 
-export default function PhoneFrame({ children }: { children: React.ReactNode }) {
+export default function PhoneFrame({ children }: PhoneFrameProps) {
   const [dark, setDark] = useState(false)
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-200 p-4">
+    <div className={`flex items-center justify-center min-h-screen p-4 transition-colors duration-300 ${dark ? 'bg-gray-900' : 'bg-gray-200'}`}>
       <div
         className={`relative w-[375px] h-[812px] rounded-[40px] shadow-2xl overflow-hidden border-[3px] border-gray-800 ${dark ? 'dark' : ''}`}
         style={{ backgroundColor: dark ? '#1C1C1E' : '#F5F5F5' }}
@@ -25,7 +29,7 @@ export default function PhoneFrame({ children }: { children: React.ReactNode }) 
 
         {/* Content area */}
         <div className="h-[calc(100%-54px-34px)] overflow-hidden relative">
-          {children}
+          {children(dark)}
         </div>
 
         {/* Home indicator */}

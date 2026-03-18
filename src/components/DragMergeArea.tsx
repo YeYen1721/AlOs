@@ -28,7 +28,7 @@ function getAutoTriggerCard(hour: number): { component: React.FC; title: string 
   return null
 }
 
-export default function DragMergeArea() {
+export default function DragMergeArea({ isDark }: { isDark: boolean }) {
   const [sliderHour, setSliderHour] = useState(7)
   const [sliderActive, setSliderActive] = useState(false)
 
@@ -65,7 +65,7 @@ export default function DragMergeArea() {
       </div>
 
       {/* Time slider */}
-      <TimeSlider value={sliderHour} onChange={handleSliderChange} />
+      <TimeSlider value={sliderHour} onChange={handleSliderChange} isDark={isDark} />
 
       {/* Icon area */}
       <div className="relative" style={{ height: 300 }}>

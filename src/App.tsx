@@ -5,7 +5,7 @@ import DragMergeArea from './components/DragMergeArea'
 function App() {
   return (
     <PhoneFrame>
-      <DragMergeArea />
+      {(isDark) => <DragMergeArea isDark={isDark} />}
     </PhoneFrame>
   )
 }
