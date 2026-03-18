@@ -58,24 +58,34 @@ export default function DragMergeArea({ isDark }: { isDark: boolean }) {
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-      {/* Header */}
-      <div className="px-5 pt-2 pb-1">
-        <h1 className="text-[15px] font-bold text-gray-900 dark:text-white">Generative OS</h1>
-        <p className="text-[11px] text-gray-500 dark:text-gray-400">Drag two apps together to merge</p>
+      {/* iOS Wallpaper background */}
+      <div className="absolute inset-0 z-0" style={{
+        background: isDark
+          ? 'linear-gradient(145deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #1a1a2e 100%)'
+          : 'linear-gradient(145deg, #667eea 0%, #764ba2 30%, #f093fb 60%, #4facfe 100%)',
+      }} />
+
+      {/* Header - Generative OS branding */}
+      <div className="relative z-10 px-5 pt-2 pb-1">
+        <h1 className="text-[15px] font-semibold text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+          Generative OS
+        </h1>
+        <p className="text-[11px] text-white/60">Drag two apps together to merge</p>
       </div>
 
       {/* Time slider */}
-      <TimeSlider value={sliderHour} onChange={handleSliderChange} isDark={isDark} />
+      <div className="relative z-10">
+        <TimeSlider value={sliderHour} onChange={handleSliderChange} isDark={isDark} />
+      </div>
 
       {/* Icon area */}
-      <div className="relative" style={{ height: 300 }}>
+      <div className="relative z-10" style={{ height: 300 }}>
         {appIcons.map((app) => (
           <AppIcon
             key={app.id}
             id={app.id}
             label={app.label}
             color={app.color}
-            icon={app.icon}
             position={iconPositions[app.id]}
             isGlowing={nearbyIcon === app.id}
             dimmed={showCard || showAnimation || sliderActive}
@@ -96,7 +106,7 @@ export default function DragMergeArea({ isDark }: { isDark: boolean }) {
 
       {/* Invalid shake visual feedback */}
       {invalidShake && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-gray-500 animate-pulse">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-sm text-white/50 animate-pulse">
           Invalid combination
         </div>
       )}
@@ -106,7 +116,7 @@ export default function DragMergeArea({ isDark }: { isDark: boolean }) {
         {sliderActive && autoCard && AutoCardContent && (
           <motion.div
             key={autoCard.title}
-            className="absolute inset-x-0 top-[100px] bottom-0 z-20 bg-white/95 dark:bg-[#2C2C2E]/95 backdrop-blur-sm rounded-t-2xl overflow-y-auto px-5 pt-4 pb-8"
+            className="absolute inset-x-0 top-[100px] bottom-0 z-20 bg-white/95 dark:bg-[#2C2C2E]/95 backdrop-blur-xl rounded-t-[20px] overflow-y-auto px-5 pt-4 pb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -116,7 +126,7 @@ export default function DragMergeArea({ isDark }: { isDark: boolean }) {
               <h2 className="text-base font-bold text-gray-900 dark:text-white">{autoCard.title}</h2>
               <button
                 onClick={() => setSliderActive(false)}
-                className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full"
+                className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-full"
               >
                 Dismiss
               </button>

@@ -19,15 +19,14 @@ const markers = [
   { hour: 21, label: '9PM' },
 ]
 
-export default function TimeSlider({ value, onChange, isDark }: TimeSliderProps) {
+export default function TimeSlider({ value, onChange }: TimeSliderProps) {
   const progress = ((value - 7) / (21 - 7)) * 100
-  const trackBg = isDark ? '#374151' : '#E5E7EB'
 
   return (
-    <div className="px-5 py-3">
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium">Time Simulation</span>
-        <span className="text-sm font-bold text-gray-900 dark:text-white">{formatTime(value)}</span>
+    <div className="mx-4 mb-2 px-3 py-2.5 rounded-2xl" style={{ backgroundColor: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(20px)' }}>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Time Simulation</span>
+        <span className="text-sm font-bold text-white">{formatTime(value)}</span>
       </div>
 
       <div className="relative">
@@ -40,14 +39,13 @@ export default function TimeSlider({ value, onChange, isDark }: TimeSliderProps)
           onChange={(e) => onChange(parseFloat(e.target.value))}
           className="w-full h-1.5 appearance-none rounded-full cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #4285F4 0%, #4285F4 ${progress}%, ${trackBg} ${progress}%, ${trackBg} 100%)`,
+            background: `linear-gradient(to right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) ${progress}%, rgba(255,255,255,0.2) ${progress}%, rgba(255,255,255,0.2) 100%)`,
           }}
         />
 
-        {/* Time markers */}
         <div className="flex justify-between mt-1">
           {markers.map((m) => (
-            <span key={m.hour} className="text-[9px] text-gray-400 dark:text-gray-500">{m.label}</span>
+            <span key={m.hour} className="text-[9px] text-white/40">{m.label}</span>
           ))}
         </div>
       </div>

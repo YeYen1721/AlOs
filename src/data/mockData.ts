@@ -129,13 +129,15 @@ export function getMergeKey(a: AppId, b: AppId): string {
 }
 
 // Icon layout positions (absolute, within phone content area)
+// Centered grid: 3 columns, 2 rows. Each icon is 60px wide.
+// Content width ~335px. Column centers at 68, 152, 236. Subtract half icon (30).
 export const iconPositions: Record<AppId, { x: number; y: number }> = {
-  calendar: { x: 30, y: 80 },
-  maps: { x: 135, y: 80 },
-  weather: { x: 240, y: 80 },
-  closet: { x: 30, y: 195 },
-  spotify: { x: 135, y: 195 },
-  spending: { x: 240, y: 195 },
+  calendar: { x: 38, y: 60 },
+  maps: { x: 138, y: 60 },
+  weather: { x: 238, y: 60 },
+  closet: { x: 38, y: 175 },
+  spotify: { x: 138, y: 175 },
+  spending: { x: 238, y: 175 },
 }
 
 // Category colors for spending

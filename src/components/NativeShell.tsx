@@ -11,24 +11,23 @@ export default function NativeShell({ children }: NativeShellProps) {
     <div
       className={`w-full min-h-screen ${dark ? 'dark' : ''}`}
       style={{
-        backgroundColor: dark ? '#1C1C1E' : '#F5F5F5',
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      {/* Status bar spacer + dark mode toggle */}
-      <div className="flex items-center justify-between px-5 pt-2 pb-0">
-        <div />
+      {/* Dark mode toggle */}
+      <div className="fixed top-[env(safe-area-inset-top)] right-4 z-50 pt-2">
         <button
           onClick={() => setDark(!dark)}
-          className="w-8 h-8 rounded-full flex items-center justify-center text-sm bg-white/20 dark:bg-white/10"
+          className="w-8 h-8 rounded-full flex items-center justify-center text-sm backdrop-blur-md"
+          style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
           aria-label="Toggle dark mode"
         >
           {dark ? '\u2600\uFE0F' : '\uD83C\uDF19'}
         </button>
       </div>
 
-      <div className="h-[calc(100vh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-40px)] overflow-hidden relative">
+      <div className="h-screen overflow-hidden relative">
         {children(dark)}
       </div>
     </div>

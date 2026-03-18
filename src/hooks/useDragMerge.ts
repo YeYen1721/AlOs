@@ -13,7 +13,7 @@ interface DragState {
 }
 
 const MERGE_DISTANCE = 60
-const ICON_CENTER_OFFSET = 28 // half of 56px icon
+const ICON_CENTER_OFFSET = 30 // half of 60px icon
 
 export function useDragMerge() {
   const [state, setState] = useState<DragState>({
