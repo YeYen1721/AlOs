@@ -8,6 +8,12 @@ const config: CapacitorConfig = {
     contentInset: 'always',
     backgroundColor: '#F5F5F5',
   },
+  server: {
+    // Live reload: point to your Vite dev server
+    // Comment out this block for production builds
+    url: 'http://192.168.1.128:5173',
+    cleartext: true,
+  },
   plugins: {
     StatusBar: {
       style: 'DARK',
